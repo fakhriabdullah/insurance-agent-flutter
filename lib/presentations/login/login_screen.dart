@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:insurance_agent_flutter/bloc/login/login_cubit.dart';
+import 'package:insurance_agent_flutter/presentations/home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,15 +29,19 @@ class _LoginScreenState extends State<LoginScreen> {
             child: BlocConsumer<LoginCubit, LoginState>(
               listener: (context, state) {
                 if (state is LoginError) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Wrong username / password")));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text(state.message ?? "Wrong username / password"),
+                    ),
+                  );
                 } else if (state is LoginSuccess) {
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const HomeScreen(),
-                  //   ),
-                  // );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                  );
                 }
               },
               builder: (context, state) {
@@ -97,19 +102,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          minimumSize: const Size(100, 55),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12))),
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          context
-                              .read<LoginCubit>()
-                              .login(username.text, password.text);
-                        }
-                      },
-                      child: const Text("Login"),
+                      onPressed: (state is LoginLoading)
+                          ? null
+                          : () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                context
+                                    .read<LoginCubit>()
+                                    .login(username.text, password.text);
+                              }
+                            },
+                      child: (state is LoginLoading)
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text("Login"),
                     ),
                   ],
                 );
