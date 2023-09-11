@@ -1,3 +1,3 @@
 class Config{
-  static const String apiUrl = "http://localhost:8080/api";
+  static const String apiUrl = "https://insurance.egalable.com/api";
 }
